@@ -1,0 +1,25 @@
+{
+  "name": "Baddie Eye",
+  "short_name": "BaddieEye",
+  "description": "속눈썹연장샵 회원 마이페이지",
+  "start_url": "/me",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#d6336c",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
