@@ -13,6 +13,9 @@ export default function KakaoLoginButton() {
       provider: 'kakao',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        // 닉네임만 요청 — 카카오 이메일은 비즈앱 검수 필요(권한 없음)라
+        // 기본 scope(이메일 포함)로 요청하면 KOE205가 발생한다.
+        scopes: 'profile_nickname',
       },
     })
     if (error) setLoading(false)
