@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPush, type PushPayload } from '@/lib/push/web-push'
-import { extractTime } from '@/lib/booking/slots'
+import { extractTime, extractKstDate, toDateStr } from '@/lib/booking/slots'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,11 +30,17 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = createAdminClient()
-  const now = Date.now()
-  const from = new Date(now + 23 * 60 * 60 * 1000).toISOString()
-  const to = new Date(now + 24 * 60 * 60 * 1000).toISOString()
 
-  // [BR-RM-01,02] 대상 예약
+  // [Hobby 플랜] 하루 1회(매일 KST 오전 9시) 실행 → "내일(KST)" 예약 전체에 발송.
+  // KST 내일 00:00 ~ 모레 00:00 범위.
+  const nowKstDate = extractKstDate(new Date().toISOString()) // 오늘(KST) YYYY-MM-DD
+  const [y, m, d] = nowKstDate.split('-').map(Number)
+  const tomorrow = toDateStr(new Date(y, m - 1, d + 1))
+  const dayAfter = toDateStr(new Date(y, m - 1, d + 2))
+  const from = `${tomorrow}T00:00:00+09:00`
+  const to = `${dayAfter}T00:00:00+09:00`
+
+  // [BR-RM-01,02] 대상 예약 (내일 확정 예약, 미발송)
   const { data, error } = await supabase
     .from('appointments')
     .select(
@@ -42,8 +48,8 @@ export async function GET(request: NextRequest) {
     )
     .eq('status', 'pending')
     .is('reminder_sent_at', null)
-    .gt('scheduled_at', from)
-    .lte('scheduled_at', to)
+    .gte('scheduled_at', from)
+    .lt('scheduled_at', to)
 
   if (error) {
     Sentry.captureException(error)
