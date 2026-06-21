@@ -27,11 +27,11 @@ export default function AdminSidebar() {
     <aside className="flex w-64 flex-col bg-white shadow-sm">
       <div className="border-b border-gray-100 p-4">
         <Image
-          src="/logo-admin.png"
+          src="/logo-pink.png"
           alt="Baddie Eye"
-          width={560}
-          height={121}
-          className="w-full rounded-md"
+          width={1057}
+          height={165}
+          className="w-full px-2"
           priority
           unoptimized
         />

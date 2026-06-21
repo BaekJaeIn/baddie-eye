@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { memberSchema } from '@/lib/validations/member'
+import type { Member } from '@/types/database'
 
 export interface MemberActionState {
   error?: string
@@ -103,8 +104,9 @@ export async function deleteMemberAction(id: string): Promise<void> {
   revalidatePath('/admin/members')
 }
 
-// 회원 상세 모달용 — 시술 히스토리 + 재방문 권장 조회
+// 회원 상세 모달용 — 회원 정보 + 시술 히스토리 + 재방문 권장 조회
 export interface MemberDetailData {
+  member: Member | null
   lastVisit: {
     visited_at: string
     treatment_name: string
@@ -112,9 +114,13 @@ export interface MemberDetailData {
   } | null
   visits: {
     id: string
+    member_id: string
+    appointment_id: string | null
+    treatment_type_id: string
     visited_at: string
     price_paid: number
     before_after_photo_url: string | null
+    created_at: string
     treatment_name: string
   }[]
 }
@@ -123,37 +129,45 @@ export async function getMemberDetailAction(
   memberId: string,
 ): Promise<MemberDetailData> {
   const supabase = createClient()
-  const [{ data: lastVisitData }, { data: visitData }] = await Promise.all([
-    supabase
-      .from('member_last_visit')
-      .select('visited_at, treatment_name, recommended_return_date')
-      .eq('member_id', memberId)
-      .maybeSingle(),
-    supabase
-      .from('visit_history')
-      .select(
-        'id, visited_at, price_paid, before_after_photo_url, treatment_types(name)',
-      )
-      .eq('member_id', memberId)
-      .order('visited_at', { ascending: false }),
-  ])
+  const [{ data: memberData }, { data: lastVisitData }, { data: visitData }] =
+    await Promise.all([
+      supabase.from('members').select('*').eq('id', memberId).maybeSingle(),
+      supabase
+        .from('member_last_visit')
+        .select('visited_at, treatment_name, recommended_return_date')
+        .eq('member_id', memberId)
+        .maybeSingle(),
+      supabase
+        .from('visit_history')
+        .select('*, treatment_types(name)')
+        .eq('member_id', memberId)
+        .order('visited_at', { ascending: false }),
+    ])
 
   const visitRows = (visitData ?? []) as unknown as {
     id: string
+    member_id: string
+    appointment_id: string | null
+    treatment_type_id: string
     visited_at: string
     price_paid: number
     before_after_photo_url: string | null
+    created_at: string
     treatment_types: { name: string } | null
   }[]
 
   return {
-    lastVisit:
-      (lastVisitData as MemberDetailData['lastVisit']) ?? null,
+    member: (memberData as Member) ?? null,
+    lastVisit: (lastVisitData as MemberDetailData['lastVisit']) ?? null,
     visits: visitRows.map((v) => ({
       id: v.id,
+      member_id: v.member_id,
+      appointment_id: v.appointment_id,
+      treatment_type_id: v.treatment_type_id,
       visited_at: v.visited_at,
       price_paid: v.price_paid,
       before_after_photo_url: v.before_after_photo_url,
+      created_at: v.created_at,
       treatment_name: v.treatment_types?.name ?? '-',
     })),
   }

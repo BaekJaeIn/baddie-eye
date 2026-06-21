@@ -7,11 +7,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Image
-            src="/logo-admin.png"
+            src="/logo-pink.png"
             alt="Baddie Eye"
-            width={560}
-            height={121}
-            className="mx-auto w-64 rounded-md"
+            width={1057}
+            height={165}
+            className="mx-auto w-64"
             priority
             unoptimized
           />

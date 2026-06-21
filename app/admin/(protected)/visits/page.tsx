@@ -1,7 +1,8 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { formatPhone } from '@/lib/format'
 import Pagination from '@/components/members/Pagination'
+import VisitsBoard, {
+  type VisitBoardItem,
+} from '@/components/visits/VisitsBoard'
 
 const PAGE_SIZE = 20
 
@@ -11,9 +12,13 @@ interface VisitsPageProps {
 
 interface VisitRow {
   id: string
+  member_id: string
+  appointment_id: string | null
+  treatment_type_id: string
   visited_at: string
   price_paid: number
-  member_id: string
+  before_after_photo_url: string | null
+  created_at: string
   members: { name: string; phone: string } | null
   treatment_types: { name: string } | null
 }
@@ -26,14 +31,26 @@ export default async function VisitsPage({ searchParams }: VisitsPageProps) {
   const supabase = createClient()
   const { data, count } = await supabase
     .from('visit_history')
-    .select(
-      'id, visited_at, price_paid, member_id, members(name, phone), treatment_types(name)',
-      { count: 'exact' },
-    )
+    .select('*, members(name, phone), treatment_types(name)', {
+      count: 'exact',
+    })
     .order('visited_at', { ascending: false })
     .range(from, to)
 
-  const visits = (data ?? []) as unknown as VisitRow[]
+  const rows = (data ?? []) as unknown as VisitRow[]
+  const visits: VisitBoardItem[] = rows.map((v) => ({
+    id: v.id,
+    member_id: v.member_id,
+    appointment_id: v.appointment_id,
+    treatment_type_id: v.treatment_type_id,
+    visited_at: v.visited_at,
+    price_paid: v.price_paid,
+    before_after_photo_url: v.before_after_photo_url,
+    created_at: v.created_at,
+    member_name: v.members?.name ?? null,
+    member_phone: v.members?.phone ?? null,
+    treatment_name: v.treatment_types?.name ?? '-',
+  }))
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE))
 
   return (
@@ -46,59 +63,7 @@ export default async function VisitsPage({ searchParams }: VisitsPageProps) {
           시술 내역이 없습니다. 예약을 완료 처리하면 자동으로 기록됩니다.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-          <table className="w-full text-sm" data-testid="visit-table">
-            <thead className="border-b border-gray-100 text-left text-gray-500">
-              <tr>
-                <th className="px-4 py-3">방문일</th>
-                <th className="px-4 py-3">회원</th>
-                <th className="px-4 py-3">시술</th>
-                <th className="px-4 py-3">결제금액</th>
-                <th className="px-4 py-3 text-right">관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visits.map((v) => (
-                <tr key={v.id} className="border-b border-gray-50">
-                  <td className="px-4 py-3 text-gray-600">
-                    {v.visited_at.slice(0, 10)}
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-800">
-                    {v.members ? (
-                      <Link
-                        href={`/admin/members/${v.member_id}`}
-                        className="hover:underline"
-                      >
-                        {v.members.name}
-                      </Link>
-                    ) : (
-                      '(삭제된 회원)'
-                    )}
-                    {v.members && (
-                      <span className="ml-2 text-xs text-gray-400">
-                        {formatPhone(v.members.phone)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {v.treatment_types?.name ?? '-'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {v.price_paid.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/visits/${v.id}/edit`}
-                      className="text-sm text-gray-500 hover:underline"
-                    >
-                      편집
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <VisitsBoard visits={visits} />
       )}
 
       <Pagination

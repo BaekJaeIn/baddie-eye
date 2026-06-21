@@ -10,8 +10,11 @@ export interface VisitListItem {
 
 export default function VisitHistoryList({
   visits,
+  onEdit,
 }: {
   visits: VisitListItem[]
+  // 모달에서 편집 시 콜백. 없으면 편집 페이지로 이동(링크).
+  onEdit?: (id: string) => void
 }) {
   if (visits.length === 0) {
     return (
@@ -32,12 +35,22 @@ export default function VisitHistoryList({
               {v.before_after_photo_url && ' · 📷'}
             </p>
           </div>
-          <Link
-            href={`/admin/visits/${v.id}/edit`}
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            편집
-          </Link>
+          {onEdit ? (
+            <button
+              type="button"
+              onClick={() => onEdit(v.id)}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              편집
+            </button>
+          ) : (
+            <Link
+              href={`/admin/visits/${v.id}/edit`}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              편집
+            </Link>
+          )}
         </li>
       ))}
     </ul>

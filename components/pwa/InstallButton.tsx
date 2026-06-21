@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { AppleIcon, AndroidIcon } from '@/components/icons/PlatformIcons'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -28,6 +29,7 @@ export default function InstallButton() {
   const [isIOS, setIsIOS] = useState(false)
   const [standalone, setStandalone] = useState(true) // 판별 전엔 숨김(앱에서 깜빡임 방지)
   const [showIosHelp, setShowIosHelp] = useState(false)
+  const [showManualHelp, setShowManualHelp] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -74,7 +76,8 @@ export default function InstallButton() {
         data-testid="install-button"
         className="flex w-full items-center justify-center gap-2 rounded-md border border-brand px-4 py-3 font-medium text-brand transition hover:bg-brand-light/10"
       >
-        📱 홈 화면에 앱 설치하기
+        <AndroidIcon className="h-4 w-4" />
+        홈 화면에 앱 설치하기
       </button>
     )
   }
@@ -87,7 +90,8 @@ export default function InstallButton() {
           onClick={() => setShowIosHelp((v) => !v)}
           className="flex w-full items-center justify-center gap-2 rounded-md border border-brand px-4 py-3 font-medium text-brand transition hover:bg-brand-light/10"
         >
-          📱 앱으로 설치하는 법
+          <AppleIcon className="h-4 w-4" />
+          앱으로 설치하는 법
         </button>
         {showIosHelp && (
           <p className="mt-2 rounded-md bg-gray-50 p-3 text-xs leading-relaxed text-gray-600">
@@ -99,6 +103,27 @@ export default function InstallButton() {
     )
   }
 
-  // 그 외(설치 프롬프트 미지원 브라우저)는 표시 안 함
-  return null
+  // 그 외(안드로이드 Chrome 등에서 beforeinstallprompt가 아직/안 뜬 경우):
+  // 네이티브 프롬프트 없이도 수동 설치 방법을 안내한다.
+  return (
+    <div data-testid="install-manual">
+      <button
+        onClick={() => setShowManualHelp((v) => !v)}
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-brand px-4 py-3 font-medium text-brand transition hover:bg-brand-light/10"
+      >
+        <AndroidIcon className="h-4 w-4" />
+        앱으로 설치하는 법
+      </button>
+      {showManualHelp && (
+        <p className="mt-2 rounded-md bg-gray-50 p-3 text-xs leading-relaxed text-gray-600">
+          안드로이드(Chrome): 우측 상단 <b>⋮ 메뉴</b> →{' '}
+          <b>&quot;앱 설치&quot;</b> 또는 <b>&quot;홈 화면에 추가&quot;</b>를
+          누르면 앱처럼 설치됩니다.
+          <br />
+          삼성 인터넷: 하단/상단 <b>메뉴</b> →{' '}
+          <b>&quot;현재 페이지 추가&quot; → &quot;홈 화면&quot;</b>.
+        </p>
+      )}
+    </div>
+  )
 }

@@ -16,17 +16,15 @@ export default async function MemberLoginPage() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <div className="text-center">
         <Image
-          src="/logo-admin.png"
+          src="/logo-pink.png"
           alt="Baddie Eye"
-          width={560}
-          height={121}
-          className="mx-auto w-56 rounded-md"
+          width={1057}
+          height={165}
+          className="mx-auto w-56"
           priority
           unoptimized
         />
-        <p className="mt-2 text-sm text-gray-500">
-          속눈썹연장샵 회원 마이페이지
-        </p>
+        <p className="mt-2 text-sm text-gray-500">Premium lash studio</p>
       </div>
       <div className="w-full space-y-4">
         <KakaoLoginButton />

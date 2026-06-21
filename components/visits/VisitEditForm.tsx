@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import PhotoUploader from './PhotoUploader'
 import type { VisitHistory } from '@/types/database'
 import type { VisitActionState } from '@/app/admin/(protected)/visits/actions'
@@ -15,6 +17,8 @@ type FormAction = (
 interface VisitEditFormProps {
   action: FormAction
   visit: VisitHistory
+  // 모달에서 사용 시 성공 콜백. 없으면 회원 상세로 이동.
+  onSuccess?: () => void
 }
 
 function SubmitButton() {
@@ -42,8 +46,19 @@ function toLocalInput(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export default function VisitEditForm({ action, visit }: VisitEditFormProps) {
+export default function VisitEditForm({
+  action,
+  visit,
+  onSuccess,
+}: VisitEditFormProps) {
   const [state, formAction] = useFormState(action, initialState)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!state.ok) return
+    if (onSuccess) onSuccess()
+    else router.push(`/admin/members/${visit.member_id}`)
+  }, [state.ok, onSuccess, router, visit.member_id])
 
   return (
     <form

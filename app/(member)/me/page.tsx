@@ -14,6 +14,7 @@ import InstallButton from '@/components/pwa/InstallButton'
 interface VisitRow {
   id: string
   visited_at: string
+  price_paid: number
   before_after_photo_url: string | null
   treatment_types: { name: string } | null
 }
@@ -40,7 +41,9 @@ export default async function MyPage() {
   const [{ data: visitData }, { data: lastVisitData }] = await Promise.all([
     supabase
       .from('visit_history')
-      .select('id, visited_at, before_after_photo_url, treatment_types(name)')
+      .select(
+        'id, visited_at, price_paid, before_after_photo_url, treatment_types(name)',
+      )
       .eq('member_id', member.id)
       .order('visited_at', { ascending: false }),
     supabase
@@ -54,6 +57,7 @@ export default async function MyPage() {
   const visits: MyVisitItem[] = visitRows.map((v) => ({
     id: v.id,
     visited_at: v.visited_at,
+    price_paid: v.price_paid,
     before_after_photo_url: v.before_after_photo_url,
     treatment_name: v.treatment_types?.name ?? '-',
   }))
