@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { getSiteOrigin } from '@/lib/site-url'
 
 export default function KakaoLoginButton() {
   const [loading, setLoading] = useState(false)
@@ -12,7 +13,7 @@ export default function KakaoLoginButton() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${getSiteOrigin()}/auth/callback`,
         // 닉네임만 요청 — 카카오 이메일은 비즈앱 검수 필요(권한 없음)라
         // 기본 scope(이메일 포함)로 요청하면 KOE205가 발생한다.
         scopes: 'profile_nickname',

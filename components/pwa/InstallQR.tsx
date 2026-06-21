@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
+import { getSiteOrigin } from '@/lib/site-url'
 
 /**
  * 회원이 휴대폰으로 스캔하면 회원용 앱(로그인 화면)으로 바로 이동하는 QR.
@@ -12,7 +13,7 @@ export default function InstallQR() {
   const [target, setTarget] = useState<string>('')
 
   useEffect(() => {
-    const url = `${window.location.origin}/login`
+    const url = `${getSiteOrigin()}/login`
     setTarget(url)
     QRCode.toDataURL(url, {
       width: 320,
