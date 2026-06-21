@@ -1,10 +1,6 @@
 import InstallQR from '@/components/pwa/InstallQR'
 import { AppleIcon, AndroidIcon } from '@/components/icons/PlatformIcons'
 
-export const metadata = {
-  title: '앱 설치 안내',
-}
-
 export default function InstallGuidePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">

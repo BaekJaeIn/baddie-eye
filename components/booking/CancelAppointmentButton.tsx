@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { cancelAppointmentAction } from '@/app/(member)/me/appointments/actions'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 
 export default function CancelAppointmentButton({
   id,
@@ -11,6 +12,7 @@ export default function CancelAppointmentButton({
   canCancel: boolean
 }) {
   const [pending, setPending] = useState(false)
+  const confirm = useConfirm()
 
   if (!canCancel) {
     return (
@@ -19,7 +21,14 @@ export default function CancelAppointmentButton({
   }
 
   async function handleCancel() {
-    if (!confirm('예약을 취소하시겠습니까?')) return
+    const ok = await confirm({
+      title: '예약 취소',
+      message: '예약을 취소하시겠습니까?',
+      confirmText: '예약 취소',
+      cancelText: '닫기',
+      destructive: true,
+    })
+    if (!ok) return
     setPending(true)
     await cancelAppointmentAction(id)
   }

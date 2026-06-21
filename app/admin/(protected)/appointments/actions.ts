@@ -4,7 +4,12 @@ import { revalidatePath } from 'next/cache'
 import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { appointmentSchema } from '@/lib/validations/appointment'
-import { combineDateTime } from '@/lib/booking/slots'
+import {
+  combineDateTime,
+  extractTime,
+  extractKstDate,
+} from '@/lib/booking/slots'
+import { notifyUser } from '@/lib/notify'
 import type { AppointmentStatus } from '@/types/database'
 
 export interface AppointmentActionState {
@@ -182,12 +187,49 @@ export async function approveAppointmentAction(id: string): Promise<void> {
       .update({ status: 'pending' })
       .eq('id', id)
       .eq('status', 'requested')
-    if (error) Sentry.captureException(error)
+    if (error) {
+      Sentry.captureException(error)
+    } else {
+      // 회원에게 예약 확정 알림 (Web Push). 실패해도 무시.
+      await notifyMemberApproved(supabase, id)
+    }
   } catch (err) {
     Sentry.captureException(err)
   }
   revalidatePath('/admin/appointments')
   revalidatePath(`/admin/appointments/${id}`)
+}
+
+// 확정된 예약의 회원에게 알림 발송
+async function notifyMemberApproved(
+  supabase: ReturnType<typeof createClient>,
+  appointmentId: string,
+): Promise<void> {
+  try {
+    const { data } = await supabase
+      .from('appointments')
+      .select('scheduled_at, members(user_id), treatment_types(name)')
+      .eq('id', appointmentId)
+      .single()
+    if (!data) return
+    const row = data as unknown as {
+      scheduled_at: string
+      members: { user_id: string | null } | null
+      treatment_types: { name: string } | null
+    }
+    const userId = row.members?.user_id
+    if (!userId) return
+    const treatmentName = row.treatment_types?.name ?? '시술'
+    await notifyUser(userId, {
+      title: '예약이 확정되었어요',
+      body: `${extractKstDate(row.scheduled_at)} ${extractTime(
+        row.scheduled_at,
+      )} · ${treatmentName} 예약이 확정되었습니다.`,
+      url: '/me/appointments',
+    })
+  } catch {
+    // 알림 실패 무시
+  }
 }
 
 // [BR-AP-01] 고객 신청 거절: requested → cancelled

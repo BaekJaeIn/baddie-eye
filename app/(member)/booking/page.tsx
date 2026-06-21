@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { TreatmentType } from '@/types/database'
 import BookingForm from '@/components/booking/BookingForm'
+import BackToMain from '@/components/member/BackToMain'
 
 export default async function BookingPage() {
   const supabase = createClient()
@@ -32,9 +32,7 @@ export default async function BookingPage() {
   return (
     <div className="p-5">
       <div className="mb-4 flex items-center justify-between">
-        <Link href="/me" className="text-sm text-gray-400 hover:text-gray-600">
-          ← 마이페이지
-        </Link>
+        <BackToMain />
       </div>
       <h1 className="mb-6 text-xl font-bold text-gray-800">예약 신청</h1>
 

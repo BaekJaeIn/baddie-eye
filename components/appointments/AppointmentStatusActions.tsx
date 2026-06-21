@@ -9,6 +9,7 @@ import {
   rejectAppointmentAction,
 } from '@/app/admin/(protected)/appointments/actions'
 import type { AppointmentStatus } from '@/types/database'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 
 interface Props {
   id: string
@@ -27,6 +28,7 @@ export default function AppointmentStatusActions({
 }: Props) {
   const [pending, setPending] = useState(false)
   const router = useRouter()
+  const confirm = useConfirm()
 
   const done = () => {
     if (onDone) onDone()
@@ -51,7 +53,13 @@ export default function AppointmentStatusActions({
         </button>
         <button
           onClick={async () => {
-            if (!confirm('이 예약 신청을 거절하시겠습니까?')) return
+            const ok = await confirm({
+              title: '예약 신청 거절',
+              message: '이 예약 신청을 거절하시겠습니까?',
+              confirmText: '거절',
+              destructive: true,
+            })
+            if (!ok) return
             setPending(true)
             await rejectAppointmentAction(id)
             done()
@@ -101,7 +109,14 @@ export default function AppointmentStatusActions({
         )}
         <button
           onClick={async () => {
-            if (!confirm('이 예약을 취소하시겠습니까?')) return
+            const ok = await confirm({
+              title: '예약 취소',
+              message: '이 예약을 취소하시겠습니까?',
+              confirmText: '예약 취소',
+              cancelText: '닫기',
+              destructive: true,
+            })
+            if (!ok) return
             setPending(true)
             await updateAppointmentStatusAction(id, 'cancelled')
             done()

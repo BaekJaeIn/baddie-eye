@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteMemberAction } from '@/app/admin/(protected)/members/actions'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 
 export default function DeleteMemberButton({
   id,
@@ -14,11 +15,16 @@ export default function DeleteMemberButton({
 }) {
   const [pending, setPending] = useState(false)
   const router = useRouter()
+  const confirm = useConfirm()
 
   async function handleDelete() {
-    if (!confirm('정말 삭제하시겠습니까?\n(예약/시술 내역은 보존됩니다)')) {
-      return
-    }
+    const ok = await confirm({
+      title: '회원 삭제',
+      message: '정말 삭제하시겠습니까?\n(예약/시술 내역은 보존됩니다)',
+      confirmText: '삭제',
+      destructive: true,
+    })
+    if (!ok) return
     setPending(true)
     await deleteMemberAction(id)
     if (onDeleted) onDeleted()

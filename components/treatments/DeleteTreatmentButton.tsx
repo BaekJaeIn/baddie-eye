@@ -3,14 +3,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteTreatmentAction } from '@/app/admin/(protected)/treatments/actions'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 
 export default function DeleteTreatmentButton({ id }: { id: string }) {
   const router = useRouter()
+  const confirm = useConfirm()
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleDelete() {
-    if (!confirm('이 시술 종류를 삭제하시겠습니까?')) return
+    const ok = await confirm({
+      title: '시술 종류 삭제',
+      message: '이 시술 종류를 삭제하시겠습니까?',
+      confirmText: '삭제',
+      destructive: true,
+    })
+    if (!ok) return
     setPending(true)
     setError(null)
     const result = await deleteTreatmentAction(id)

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import LoginForm from '@/components/auth/LoginForm'
+import InstallButton from '@/components/pwa/InstallButton'
 
 export default function LoginPage() {
   return (
@@ -19,6 +20,9 @@ export default function LoginPage() {
         </div>
         <div className="rounded-lg bg-white p-8 shadow-sm">
           <LoginForm />
+        </div>
+        <div className="mt-4">
+          <InstallButton />
         </div>
       </div>
     </main>

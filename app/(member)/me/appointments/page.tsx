@@ -5,6 +5,7 @@ import type { AppointmentStatus } from '@/types/database'
 import { extractTime, extractKstDate } from '@/lib/booking/slots'
 import StatusBadge from '@/components/booking/StatusBadge'
 import CancelAppointmentButton from '@/components/booking/CancelAppointmentButton'
+import BackToMain from '@/components/member/BackToMain'
 
 interface ApptRow {
   id: string
@@ -42,9 +43,7 @@ export default async function MyAppointmentsPage() {
   return (
     <div className="p-5">
       <div className="mb-4 flex items-center justify-between">
-        <Link href="/me" className="text-sm text-gray-400 hover:text-gray-600">
-          ← 마이페이지
-        </Link>
+        <BackToMain />
         <Link
           href="/booking"
           data-testid="new-booking-link"

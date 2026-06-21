@@ -6,7 +6,12 @@ import { saveSubscriptionAction } from '@/app/(member)/me/push-actions'
 
 type PushState = 'idle' | 'enabled' | 'unsupported' | 'denied'
 
-export default function PushSubscriptionManager() {
+// owner=true: 원장(관리자) 알림 구독 — 예약 신청 시 알림 수신용
+export default function PushSubscriptionManager({
+  owner = false,
+}: {
+  owner?: boolean
+}) {
   const [state, setState] = useState<PushState>('idle')
 
   useEffect(() => {
@@ -22,12 +27,12 @@ export default function PushSubscriptionManager() {
         return
       }
 
-      // [BR-PS-01] 마이페이지 진입 시 구독 시도
+      // [BR-PS-01] 진입 시 구독 시도
       try {
         const sub = await subscribeToPush()
         if (!active) return
         if (sub) {
-          await saveSubscriptionAction(sub)
+          await saveSubscriptionAction(sub, owner)
           setState('enabled')
         }
       } catch {
@@ -39,7 +44,7 @@ export default function PushSubscriptionManager() {
     return () => {
       active = false
     }
-  }, [])
+  }, [owner])
 
   if (state === 'enabled') {
     return (
@@ -47,7 +52,7 @@ export default function PushSubscriptionManager() {
         data-testid="push-manager"
         className="text-center text-xs text-gray-400"
       >
-        🔔 예약 리마인더 알림이 켜져 있습니다.
+        🔔 {owner ? '예약 신청 알림' : '예약 리마인더 알림'}이 켜져 있습니다.
       </p>
     )
   }

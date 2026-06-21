@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { memberBookingSchema } from '@/lib/validations/booking'
 import { combineDateTime, isWithinBookingWindow } from '@/lib/booking/slots'
+import { notifyOwners } from '@/lib/notify'
 
 export interface BookingActionState {
   error?: string
@@ -55,6 +56,35 @@ export async function requestAppointmentAction(
   } catch (err) {
     Sentry.captureException(err)
     return { error: GENERIC_ERROR }
+  }
+
+  // 원장에게 새 예약 신청 알림 (Web Push). 실패해도 본 흐름에 영향 없음.
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    const [memberRes, treatmentRes] = await Promise.all([
+      supabase
+        .from('members')
+        .select('name')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle(),
+      supabase
+        .from('treatment_types')
+        .select('name')
+        .eq('id', parsed.data.treatment_type_id)
+        .maybeSingle(),
+    ])
+    const memberName = (memberRes.data as { name: string } | null)?.name ?? '회원'
+    const treatmentName =
+      (treatmentRes.data as { name: string } | null)?.name ?? '시술'
+    await notifyOwners({
+      title: '새 예약 신청',
+      body: `${memberName}님 · ${treatmentName} · ${parsed.data.date} ${parsed.data.time}`,
+      url: '/admin/appointments',
+    })
+  } catch {
+    // 알림 실패 무시
   }
 
   redirect('/me/appointments')

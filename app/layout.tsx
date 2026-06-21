@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister'
+import { ConfirmProvider } from '@/components/ui/ConfirmDialog'
 
 export const metadata: Metadata = {
-  title: 'Baddie Eye — 속눈썹연장샵 관리',
+  title: 'Baddie Eye — Premium Lash Studio',
   description: '속눈썹연장샵 회원·예약·시술 관리 시스템',
   manifest: '/manifest.json',
   appleWebApp: {
@@ -31,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        {children}
+        <ConfirmProvider>{children}</ConfirmProvider>
         <ServiceWorkerRegister />
       </body>
     </html>
