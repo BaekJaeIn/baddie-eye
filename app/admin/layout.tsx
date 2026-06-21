@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Baddie Eye 관리자',
+    title: 'BaddieEye 관리자',
   },
 }
 

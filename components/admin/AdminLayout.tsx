@@ -1,6 +1,7 @@
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 import PushSubscriptionManager from '@/components/push/PushSubscriptionManager'
+import BackExitGuard from '@/components/pwa/BackExitGuard'
 
 // Admin 보호 영역 셸 — 좌측 사이드바 + 상단 헤더 + 메인 콘텐츠.
 // 페이지 제목은 각 page가 본문에서 표시한다.
@@ -20,6 +21,8 @@ export default function AdminLayout({
       <div className="sr-only">
         <PushSubscriptionManager owner />
       </div>
+      {/* 설치 앱에서 뒤로가기 두 번 → 종료 */}
+      <BackExitGuard />
     </div>
   )
 }
