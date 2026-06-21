@@ -22,7 +22,8 @@ export default function VisitsBoard({ visits }: { visits: VisitBoardItem[] }) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+      {/* 데스크톱: 테이블 */}
+      <div className="hidden overflow-x-auto rounded-lg bg-white shadow-sm md:block">
         <table className="w-full text-sm" data-testid="visit-table">
           <thead className="border-b border-gray-100 text-left text-gray-500">
             <tr>
@@ -75,6 +76,59 @@ export default function VisitsBoard({ visits }: { visits: VisitBoardItem[] }) {
           </tbody>
         </table>
       </div>
+
+      {/* 모바일: 카드 목록 */}
+      <ul className="space-y-3 md:hidden" data-testid="visit-cards">
+        {visits.map((v) => (
+          <li key={v.id} className="rounded-lg bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                {v.member_name ? (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMemberId(v.member_id)}
+                    className="font-medium text-gray-800 hover:underline"
+                  >
+                    {v.member_name}
+                  </button>
+                ) : (
+                  <span className="font-medium text-gray-800">
+                    (삭제된 회원)
+                  </span>
+                )}
+                {v.member_phone && (
+                  <p className="text-xs text-gray-400">
+                    {formatPhone(v.member_phone)}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditVisit(v)}
+                className="shrink-0 text-sm text-gray-500 hover:underline"
+              >
+                편집
+              </button>
+            </div>
+            <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
+              <div>
+                <dt className="text-gray-400">방문일</dt>
+                <dd className="text-gray-700">{v.visited_at.slice(0, 10)}</dd>
+              </div>
+              <div>
+                <dt className="text-gray-400">시술</dt>
+                <dd className="text-gray-700">{v.treatment_name}</dd>
+              </div>
+              <div>
+                <dt className="text-gray-400">결제금액</dt>
+                <dd className="text-gray-700">
+                  {v.price_paid.toLocaleString()}원
+                </dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ul>
 
       {/* 회원 상세 모달 */}
       <MemberDetailModal

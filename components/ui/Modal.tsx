@@ -39,7 +39,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
         aria-hidden
       />
       {/* 패널 */}
-      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-auto rounded-lg bg-white p-6 shadow-xl">
+      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-auto rounded-lg bg-white p-4 shadow-xl sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
           <button

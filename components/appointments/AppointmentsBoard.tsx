@@ -1,10 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Member, TreatmentType } from '@/types/database'
-import { shiftWeek, extractKstDate, extractTime } from '@/lib/booking/slots'
+import {
+  shiftWeek,
+  extractKstDate,
+  extractTime,
+  WEEKDAY_LABELS,
+} from '@/lib/booking/slots'
 import { STATUS_LABEL, STATUS_STYLE } from '@/lib/booking/status'
 import {
   createAppointmentAction,
@@ -12,8 +17,13 @@ import {
 } from '@/app/admin/(protected)/appointments/actions'
 import Modal from '@/components/ui/Modal'
 import WeekCalendar, { type CalendarAppointment } from './WeekCalendar'
+import DayCalendar from './DayCalendar'
 import AppointmentForm from './AppointmentForm'
 import AppointmentStatusActions from './AppointmentStatusActions'
+
+function todayKst() {
+  return extractKstDate(new Date().toISOString())
+}
 
 interface Props {
   weekStart: string
@@ -40,6 +50,19 @@ export default function AppointmentsBoard({
   const [detail, setDetail] = useState<CalendarAppointment | null>(null)
   // 수정 모달
   const [editing, setEditing] = useState<CalendarAppointment | null>(null)
+  // 모바일 일별 보기에서 선택된 날짜
+  const [selectedDay, setSelectedDay] = useState<string>(() => {
+    const t = todayKst()
+    return days.includes(t) ? t : days[0]
+  })
+
+  // 주가 바뀌면 선택 날짜를 새 주 범위로 보정
+  useEffect(() => {
+    if (!days.includes(selectedDay)) {
+      const t = todayKst()
+      setSelectedDay(days.includes(t) ? t : days[0])
+    }
+  }, [days, selectedDay])
 
   const refresh = () => router.refresh()
   const closeAll = () => {
@@ -58,8 +81,8 @@ export default function AppointmentsBoard({
     <div>
       <h2 className="mb-4 text-xl font-semibold text-gray-800">예약 관리</h2>
 
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/admin/appointments?week=${shiftWeek(weekStart, -1)}`}
             className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50"
@@ -78,7 +101,7 @@ export default function AppointmentsBoard({
           >
             다음 주 →
           </Link>
-          <span className="ml-2 text-sm text-gray-500">
+          <span className="w-full text-sm text-gray-500 sm:ml-2 sm:w-auto">
             {days[0]} ~ {days[6]}
           </span>
         </div>
@@ -86,21 +109,57 @@ export default function AppointmentsBoard({
           onClick={() => setNewSlot({})}
           disabled={!canBook}
           data-testid="appointment-create-button"
-          className="rounded-md bg-brand px-4 py-2 text-sm text-white hover:bg-brand-dark disabled:opacity-50"
+          className="w-full rounded-md bg-brand px-4 py-2 text-sm text-white hover:bg-brand-dark disabled:opacity-50 sm:w-auto"
           title={canBook ? '' : '회원과 시술 종류를 먼저 등록해주세요'}
         >
           + 예약 등록
         </button>
       </div>
 
-      <WeekCalendar
-        weekStart={weekStart}
-        appointments={appointments}
-        onSlotClick={(date, time) => {
-          if (canBook) setNewSlot({ date, time })
-        }}
-        onAppointmentClick={(apt) => setDetail(apt)}
-      />
+      {/* 데스크톱: 주간 보기 */}
+      <div className="hidden md:block">
+        <WeekCalendar
+          weekStart={weekStart}
+          appointments={appointments}
+          onSlotClick={(date, time) => {
+            if (canBook) setNewSlot({ date, time })
+          }}
+          onAppointmentClick={(apt) => setDetail(apt)}
+        />
+      </div>
+
+      {/* 모바일: 일별 보기 (요일 칩 + 하루 캘린더) */}
+      <div className="md:hidden">
+        <div className="mb-3 flex gap-1">
+          {days.map((date, i) => {
+            const isSel = date === selectedDay
+            const isToday = date === todayKst()
+            return (
+              <button
+                key={date}
+                onClick={() => setSelectedDay(date)}
+                data-testid={`day-chip-${date}`}
+                className={
+                  isSel
+                    ? 'flex-1 basis-0 rounded-md bg-brand py-1.5 text-center text-white'
+                    : `flex-1 basis-0 rounded-md py-1.5 text-center ${isToday ? 'bg-brand-light/10 text-brand' : 'bg-gray-50 text-gray-600'}`
+                }
+              >
+                <div className="text-[10px]">{WEEKDAY_LABELS[i]}</div>
+                <div className="text-xs font-medium">{date.slice(8)}</div>
+              </button>
+            )
+          })}
+        </div>
+        <DayCalendar
+          date={selectedDay}
+          appointments={appointments}
+          onSlotClick={(date, time) => {
+            if (canBook) setNewSlot({ date, time })
+          }}
+          onAppointmentClick={(apt) => setDetail(apt)}
+        />
+      </div>
 
       {/* 등록 모달 */}
       <Modal

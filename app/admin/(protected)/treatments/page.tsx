@@ -25,41 +25,81 @@ export default async function TreatmentsPage() {
           등록된 시술 종류가 없습니다.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-          <table className="w-full text-sm" data-testid="treatment-table">
-            <thead className="border-b border-gray-100 text-left text-gray-500">
-              <tr>
-                <th className="px-4 py-3">시술명</th>
-                <th className="px-4 py-3">소요시간</th>
-                <th className="px-4 py-3">기본가격</th>
-                <th className="px-4 py-3">권장주기</th>
-                <th className="px-4 py-3 text-right">관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {treatments.map((t) => (
-                <tr key={t.id} className="border-b border-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">
-                    {t.name}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{t.duration_min}분</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {t.base_price.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {t.recommended_interval_days
-                      ? `${t.recommended_interval_days}일`
-                      : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-right">
+        <>
+          {/* 데스크톱: 테이블 */}
+          <div className="hidden overflow-x-auto rounded-lg bg-white shadow-sm md:block">
+            <table className="w-full text-sm" data-testid="treatment-table">
+              <thead className="border-b border-gray-100 text-left text-gray-500">
+                <tr>
+                  <th className="px-4 py-3">시술명</th>
+                  <th className="px-4 py-3">소요시간</th>
+                  <th className="px-4 py-3">기본가격</th>
+                  <th className="px-4 py-3">권장주기</th>
+                  <th className="px-4 py-3 text-right">관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {treatments.map((t) => (
+                  <tr key={t.id} className="border-b border-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-800">
+                      {t.name}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {t.duration_min}분
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {t.base_price.toLocaleString()}원
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {t.recommended_interval_days
+                        ? `${t.recommended_interval_days}일`
+                        : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <TreatmentEditButton treatment={t} />
+                      <DeleteTreatmentButton id={t.id} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 모바일: 카드 목록 */}
+          <ul className="space-y-3 md:hidden" data-testid="treatment-cards">
+            {treatments.map((t) => (
+              <li key={t.id} className="rounded-lg bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-800">{t.name}</p>
+                  <div className="flex shrink-0 items-center gap-3">
                     <TreatmentEditButton treatment={t} />
                     <DeleteTreatmentButton id={t.id} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+                <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div>
+                    <dt className="text-gray-400">소요시간</dt>
+                    <dd className="text-gray-700">{t.duration_min}분</dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-400">기본가격</dt>
+                    <dd className="text-gray-700">
+                      {t.base_price.toLocaleString()}원
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-400">권장주기</dt>
+                    <dd className="text-gray-700">
+                      {t.recommended_interval_days
+                        ? `${t.recommended_interval_days}일`
+                        : '-'}
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   )

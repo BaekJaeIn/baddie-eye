@@ -21,12 +21,33 @@ function detectStandalone() {
   return displayModeApp || iosStandalone
 }
 
+// 메신저 등 인앱 브라우저인지 — 이 경우 beforeinstallprompt가 오지 않아
+// 네이티브 설치가 불가능하므로, 외부 브라우저로 열도록 유도해야 한다.
+function detectInApp(ua: string): boolean {
+  return /KAKAOTALK|NAVER|DaumApps|Instagram|FBAN|FBAV|FB_IAB|Line\/|Snapchat|; wv\)/i.test(
+    ua,
+  )
+}
+
+// 현재 페이지를 안드로이드 Chrome에서 강제로 열기 (intent URL).
+// Chrome이 없으면 fallback_url로 원래 주소를 연다.
+function openInChrome() {
+  const href = window.location.href
+  const noScheme = href.replace(/^https?:\/\//, '')
+  const intentUrl =
+    `intent://${noScheme}#Intent;scheme=https;package=com.android.chrome;` +
+    `S.browser_fallback_url=${encodeURIComponent(href)};end`
+  window.location.href = intentUrl
+}
+
 export default function InstallButton() {
   const [mounted, setMounted] = useState(false)
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
   )
   const [isIOS, setIsIOS] = useState(false)
+  const [isAndroid, setIsAndroid] = useState(false)
+  const [inApp, setInApp] = useState(false)
   const [standalone, setStandalone] = useState(true) // 판별 전엔 숨김(앱에서 깜빡임 방지)
   const [showIosHelp, setShowIosHelp] = useState(false)
   const [showManualHelp, setShowManualHelp] = useState(false)
@@ -37,6 +58,8 @@ export default function InstallButton() {
 
     const ua = window.navigator.userAgent
     setIsIOS(/iPad|iPhone|iPod/.test(ua))
+    setIsAndroid(/Android/i.test(ua))
+    setInApp(detectInApp(ua))
 
     const handler = (e: Event) => {
       e.preventDefault()
@@ -63,6 +86,41 @@ export default function InstallButton() {
 
   // 클라이언트 판별 완료 전 또는 이미 설치된 앱 모드면 표시 안 함
   if (!mounted || standalone) return null
+
+  // 메신저 인앱 브라우저: 설치가 불가하므로 외부 브라우저로 유도
+  if (inApp) {
+    // 안드로이드 → Chrome으로 바로 열기
+    if (isAndroid) {
+      return (
+        <div data-testid="install-inapp-android">
+          <button
+            onClick={openInChrome}
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-brand px-4 py-3 font-medium text-brand transition hover:bg-brand-light/10"
+          >
+            <AndroidIcon className="h-4 w-4" />
+            Chrome으로 열어서 설치하기
+          </button>
+          <p className="mt-2 rounded-md bg-gray-50 p-3 text-xs leading-relaxed text-gray-600">
+            앱 설치는 Chrome에서만 가능해요. 위 버튼을 누르면 Chrome으로 열립니다.
+            (안 열리면 우측 상단 <b>⋮ 메뉴 → &quot;다른 브라우저로 열기&quot;</b>)
+          </p>
+        </div>
+      )
+    }
+    // 아이폰 인앱 브라우저 → Safari로 열도록 안내 (강제 불가)
+    return (
+      <div
+        data-testid="install-inapp-ios"
+        className="rounded-md bg-gray-50 p-3 text-xs leading-relaxed text-gray-600"
+      >
+        <p className="mb-1 flex items-center gap-1.5 font-medium text-gray-700">
+          <AppleIcon className="h-4 w-4" /> 앱 설치는 Safari에서 가능해요
+        </p>
+        우측 하단/상단 메뉴에서 <b>&quot;Safari로 열기&quot;</b>를 누른 뒤,
+        하단 <b>공유 버튼</b>(□↑) → <b>&quot;홈 화면에 추가&quot;</b>를 선택하세요.
+      </div>
+    )
+  }
 
   // Android 등: 네이티브 설치 프롬프트 사용
   if (deferred) {
