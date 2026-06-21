@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 interface NavItem {
@@ -16,6 +17,7 @@ const navItems: NavItem[] = [
   { label: '시술 종류', href: '/admin/treatments' }, // Bolt 3
   { label: '시술 내역', href: '/admin/visits' }, // Bolt 3.5
   { label: '통계', href: '/admin/stats' }, // Bolt 7
+  { label: '앱 설치 안내', href: '/admin/install' }, // QR 안내
 ]
 
 export default function AdminSidebar() {
@@ -23,9 +25,17 @@ export default function AdminSidebar() {
 
   return (
     <aside className="flex w-64 flex-col bg-white shadow-sm">
-      <div className="border-b border-gray-100 p-6">
-        <h1 className="text-xl font-bold text-brand">Baddie Eye</h1>
-        <p className="mt-0.5 text-xs text-gray-400">관리자</p>
+      <div className="border-b border-gray-100 p-4">
+        <Image
+          src="/logo-admin.png"
+          alt="Baddie Eye"
+          width={560}
+          height={121}
+          className="w-full rounded-md"
+          priority
+          unoptimized
+        />
+        <p className="mt-1 text-center text-xs text-gray-400">관리자</p>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-1">

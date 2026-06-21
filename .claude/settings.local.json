@@ -42,7 +42,8 @@
       "Bash(git init *)",
       "Bash(git add *)",
       "Bash(grep -E \"^\\\\.env\\\\.local$\")",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { try { Stop-Process -Id $_.OwningProcess -Force -ErrorAction Stop } catch {} }; Start-Sleep -Seconds 2; if \\(Test-Path \"d:\\\\백재인\\\\스터디\\\\baddie-eye\\\\.next\"\\) { Remove-Item -Recurse -Force \"d:\\\\백재인\\\\스터디\\\\baddie-eye\\\\.next\" -ErrorAction SilentlyContinue }; Write-Output \"dev 종료 + .next 삭제 완료\")"
     ]
   }
 }

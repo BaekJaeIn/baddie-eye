@@ -37,6 +37,15 @@ export async function createTreatmentAction(
     const { error } = await supabase.from('treatment_types').insert(parsed.data)
     if (error) {
       if (error.code === '23505') return { error: DUPLICATE_NAME_ERROR }
+      // [개발 진단] 실제 원인 확인 (RLS 등). 서버 터미널에만 출력.
+      if (process.env.NODE_ENV === 'development') {
+        console.error(
+          '[treatment] insert 실패:',
+          error.code,
+          '|',
+          error.message,
+        )
+      }
       Sentry.captureException(error)
       return { error: GENERIC_ERROR }
     }

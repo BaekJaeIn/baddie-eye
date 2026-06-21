@@ -9,6 +9,7 @@ import MyVisitHistory, {
   type MyVisitItem,
 } from '@/components/member/MyVisitHistory'
 import PushSubscriptionManager from '@/components/push/PushSubscriptionManager'
+import InstallButton from '@/components/pwa/InstallButton'
 
 interface VisitRow {
   id: string
@@ -128,6 +129,9 @@ export default async function MyPage() {
 
         {/* 푸시 알림 구독 (자동 시도) */}
         <PushSubscriptionManager />
+
+        {/* 앱 설치 (미설치 상태에서만 노출) */}
+        <InstallButton />
       </div>
     </div>
   )

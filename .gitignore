@@ -48,3 +48,6 @@ pnpm-debug.log*
 
 # OS
 Thumbs.db
+
+# 아이콘 원본 (커밋 불필요, 로컬 보관)
+/public/logo-source.*

@@ -8,14 +8,18 @@ import {
   isWithinBookingWindow,
 } from '@/lib/booking/slots'
 
-// 날짜별 가용 슬롯 조회. 점유 슬롯(get_taken_slots) + 과거 슬롯 제외.
+// 날짜별 전체 슬롯 + 가용 여부 조회.
+// 점유 슬롯(소요시간 반영)·과거 슬롯은 available:false로 표시(숨기지 않음).
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get('date')
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json({ error: 'invalid date' }, { status: 400 })
   }
   if (!isWithinBookingWindow(date)) {
-    return NextResponse.json({ slots: [] })
+    // 범위 밖 날짜 — 전체 비활성
+    return NextResponse.json({
+      slots: generateSlots().map((time) => ({ time, available: false })),
+    })
   }
 
   const supabase = createClient()
@@ -47,11 +51,11 @@ export async function GET(request: NextRequest) {
   const isToday = date === extractKstDate(nowIso)
   const nowTime = extractTime(nowIso)
 
-  const slots = generateSlots().filter((t) => {
-    if (taken.has(t)) return false
-    if (isToday && t <= nowTime) return false // 오늘 지난 시간 제외
-    return true
-  })
+  const slots = generateSlots().map((t) => ({
+    time: t,
+    // 점유(소요시간 반영)도 아니고 지난 시간도 아니면 가용
+    available: !taken.has(t) && !(isToday && t <= nowTime),
+  }))
 
   return NextResponse.json({ slots })
 }

@@ -8,7 +8,7 @@ import {
   requestAppointmentAction,
   type BookingActionState,
 } from '@/app/(member)/booking/actions'
-import SlotPicker from './SlotPicker'
+import SlotPicker, { type Slot } from './SlotPicker'
 
 const initialState: BookingActionState = {}
 
@@ -66,7 +66,7 @@ export default function BookingForm({
   const bounds = bookingDateBounds()
   const [date, setDate] = useState(defaults?.date ?? toDateStr(new Date()))
   const [time, setTime] = useState(defaults?.time ?? '')
-  const [slots, setSlots] = useState<string[]>([])
+  const [slots, setSlots] = useState<Slot[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -76,16 +76,14 @@ export default function BookingForm({
       .then((r) => r.json())
       .then((d) => {
         if (!active) return
-        let available: string[] = d.slots ?? []
-        // 변경 시: 현재 예약 슬롯(같은 날짜)이 점유로 빠지므로 다시 포함
-        if (
-          defaults?.date === date &&
-          defaults?.time &&
-          !available.includes(defaults.time)
-        ) {
-          available = [...available, defaults.time].sort()
+        const list: Slot[] = d.slots ?? []
+        // 변경 시: 현재 예약 슬롯(같은 날짜)은 자기 예약이라 점유로 빠지지만
+        // 선택 유지 위해 가용으로 표시
+        if (defaults?.date === date && defaults?.time) {
+          const idx = list.findIndex((s) => s.time === defaults.time)
+          if (idx >= 0) list[idx] = { ...list[idx], available: true }
         }
-        setSlots(available)
+        setSlots(list)
       })
       .catch(() => {
         if (active) setSlots([])

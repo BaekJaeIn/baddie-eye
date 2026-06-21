@@ -1,7 +1,12 @@
 'use client'
 
+export interface Slot {
+  time: string
+  available: boolean
+}
+
 interface SlotPickerProps {
-  slots: string[]
+  slots: Slot[]
   selected: string
   onSelect: (time: string) => void
   loading: boolean
@@ -26,21 +31,28 @@ export default function SlotPicker({
 
   return (
     <div className="grid grid-cols-4 gap-2" data-testid="slot-picker">
-      {slots.map((t) => (
-        <button
-          key={t}
-          type="button"
-          onClick={() => onSelect(t)}
-          data-testid={`booking-slot-${t}`}
-          className={
-            selected === t
-              ? 'rounded-md bg-brand px-2 py-2 text-sm text-white'
-              : 'rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700 hover:border-brand'
-          }
-        >
-          {t}
-        </button>
-      ))}
+      {slots.map((s) => {
+        const isSelected = selected === s.time
+        const disabled = !s.available
+        return (
+          <button
+            key={s.time}
+            type="button"
+            disabled={disabled}
+            onClick={() => onSelect(s.time)}
+            data-testid={`booking-slot-${s.time}`}
+            className={
+              isSelected
+                ? 'rounded-md bg-brand px-2 py-2 text-sm text-white'
+                : disabled
+                  ? 'cursor-not-allowed rounded-md border border-gray-100 bg-gray-50 px-2 py-2 text-sm text-gray-300'
+                  : 'rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700 hover:border-brand'
+            }
+          >
+            {s.time}
+          </button>
+        )
+      })}
     </div>
   )
 }
