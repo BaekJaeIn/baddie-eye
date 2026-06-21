@@ -11,10 +11,10 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex h-screen bg-gray-100">
-      <AdminSidebar />
+      <AdminSidebar className="hidden md:flex" />
       <div className="flex flex-1 flex-col overflow-hidden">
         <AdminHeader />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
       {/* 원장 알림 구독 (예약 신청 시 푸시) — 화면에 보이지 않음 */}
       <div className="sr-only">
