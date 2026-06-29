@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { subscriptionSchema } from '@/lib/validations/push'
 
-// 구독 저장 [BR-PS-03,05]
+// 푸시 구독 저장 [BR-PS-03,05]
 // isOwner=true는 "원장 알림(예약 신청)" 대상으로 표시. 단, 실제 관리자
 // (app_metadata.role === 'admin')만 허용 — 회원이 원장 알림을 가로채지 못하게 한다.
 export async function saveSubscriptionAction(
@@ -43,15 +43,4 @@ export async function saveSubscriptionAction(
     return { ok: false }
   }
   return { ok: true }
-}
-
-export async function deleteSubscriptionAction(
-  endpoint: string,
-): Promise<void> {
-  const supabase = createClient()
-  try {
-    await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint)
-  } catch (err) {
-    Sentry.captureException(err)
-  }
 }

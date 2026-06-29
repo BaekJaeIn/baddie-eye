@@ -62,3 +62,13 @@ export interface MemberLastVisit {
   recommended_interval_days: number | null
   recommended_return_date: string | null
 }
+
+// 태블릿 동의서 — 매장 태블릿에서 회원이 규약에 동의한 기록
+export interface Consent {
+  id: string
+  member_id: string
+  terms_version: string
+  agreed: boolean
+  agreed_at: string
+  created_at: string
+}

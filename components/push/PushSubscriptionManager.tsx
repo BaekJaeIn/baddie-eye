@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { isPushSupported, subscribeToPush } from '@/lib/push/subscribe'
-import { saveSubscriptionAction } from '@/app/(member)/me/push-actions'
+import { saveSubscriptionAction } from '@/components/push/actions'
 
 type PushState = 'idle' | 'enabled' | 'unsupported' | 'denied'
 

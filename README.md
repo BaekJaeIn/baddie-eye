@@ -1,15 +1,14 @@
 # Baddie Eye — 속눈썹연장샵 회원관리 시스템
 
 1인 운영 속눈썹연장샵을 위한 회원·예약·시술 관리 시스템.
-**Admin 웹(데스크탑)** + **Member PWA(모바일)** 단일 코드베이스.
+**Admin 웹(데스크탑)** + **태블릿 동의서 앱(매장 키오스크)** 단일 코드베이스.
 
 ## 기술 스택
 
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Backend/DB**: Supabase (Postgres + Auth + Storage)
-- **고객 인증**: Kakao OAuth
 - **차트**: recharts
-- **알림**: Web Push (VAPID) + Vercel Cron
+- **알림**: Web Push (VAPID) — 원장 알림
 - **에러 추적**: Sentry
 - **테스트**: Vitest (단위) + Playwright (E2E)
 - **배포**: Vercel + Supabase
@@ -24,12 +23,12 @@
 - 매출 통계 — 월별 총매출/시술별/재방문율/신규vs재방문 (차트)
 - 대시보드 — 재방문 권장 회원, 승인 대기 예약
 
-### Member (모바일 PWA)
-- 카카오 로그인 + 전화번호 회원 연결
-- 마이페이지 — 등급/포인트/시술 히스토리/재방문 권장
-- 예약 신청 (가용 슬롯) / 내 예약 / 24시간 전 취소·변경
-- 웹푸시 예약 리마인더
-- 홈 화면 추가 (PWA)
+### 태블릿 동의서 앱 (매장 키오스크)
+- 관리자(원장) 세션으로 운영 — 매장 태블릿에 띄워두고 사용
+- 회원 선택 — 이름/전화번호로 검색해 등록된 회원 선택 (신규는 관리자 앱에서 먼저 등록)
+- 규약 표시 — 시술 동의 + 개인정보 수집·이용 동의서 (샘플 문구, 버전 관리)
+- 동의/거부 기록 — `consents` 테이블에 회원·버전·동의여부·시각 저장
+- 라우트: `/tablet` → `/tablet/[memberId]` → `/tablet/complete`
 
 ## 시작하기
 
@@ -45,14 +44,14 @@ cp .env.local.example .env.local
 ```
 
 ### 3. DB 마이그레이션
-Supabase SQL Editor에서 `supabase/migrations/001~007`을 순서대로 실행.
+Supabase SQL Editor에서 `supabase/migrations/001~011`을 순서대로 실행.
 자세히는 [DEPLOYMENT.md](DEPLOYMENT.md) 참조.
 
 ### 4. 개발 서버
 ```bash
 pnpm dev
-# Admin:  http://localhost:3000/admin/login
-# Member: http://localhost:3000/login
+# Admin:   http://localhost:3000/admin/login
+# 태블릿:  http://localhost:3000/tablet  (관리자 로그인 필요)
 ```
 
 ## 스크립트
@@ -69,16 +68,18 @@ pnpm dev
 
 [DEPLOYMENT.md](DEPLOYMENT.md) — Supabase + Vercel 배포 전체 절차 + 환경변수 정리.
 
-## 개발 로드맵 (완료)
+## 개발 로드맵
 
 - [x] **Bolt 1**: 프로젝트 셋업, Admin 로그인
 - [x] **Bolt 2**: Admin 회원 관리
 - [x] **Bolt 3**: Admin 예약/시술 관리
 - [x] **Bolt 3.5**: 시술 내역 (자동 생성, 재방문 권장)
-- [x] **Bolt 4**: Member PWA (카카오 로그인, 마이페이지)
-- [x] **Bolt 5**: Member 예약 기능 (신청/승인/취소)
-- [x] **Bolt 6**: 웹푸시 알림 (예약 리마인더)
 - [x] **Bolt 7**: 매출 통계 & 배포 마무리
+- [x] **태블릿 동의서 앱**: 매장 키오스크에서 규약 동의 받기
+
+> 고객용 PWA(카카오 로그인·마이페이지·고객 예약·웹푸시 리마인더)는 제거되었습니다.
+> 관련 DB 구성은 `010_remove_member_app.sql`로 admin 전용 RLS로 되돌렸습니다.
+> (원장 푸시 알림용 `push_subscriptions`는 유지)
 
 ## 설계 문서
 

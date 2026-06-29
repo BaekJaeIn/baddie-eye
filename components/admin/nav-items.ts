@@ -11,5 +11,6 @@ export const navItems: NavItem[] = [
   { label: '시술 종류', href: '/admin/treatments' }, // Bolt 3
   { label: '시술 내역', href: '/admin/visits' }, // Bolt 3.5
   { label: '통계', href: '/admin/stats' }, // Bolt 7
-  { label: '앱 설치 안내', href: '/admin/install' }, // QR 안내
+  { label: '태블릿 동의서', href: '/tablet' }, // 매장 태블릿 키오스크
+  { label: '태블릿 설치 안내', href: '/admin/install' }, // 태블릿 앱 설치 QR
 ]

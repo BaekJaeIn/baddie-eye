@@ -5,15 +5,16 @@ import QRCode from 'qrcode'
 import { getSiteOrigin } from '@/lib/site-url'
 
 /**
- * 회원이 휴대폰으로 스캔하면 회원용 앱(로그인 화면)으로 바로 이동하는 QR.
+ * 태블릿으로 스캔하면 동의서 앱(/tablet)으로 바로 이동하는 QR.
  * 배포 주소를 별도로 입력할 필요 없이, 현재 접속한 도메인을 기준으로 생성한다.
+ * (태블릿이 미로그인 상태면 관리자 로그인으로 안내된다.)
  */
 export default function InstallQR() {
   const [dataUrl, setDataUrl] = useState<string>('')
   const [target, setTarget] = useState<string>('')
 
   useEffect(() => {
-    const url = `${getSiteOrigin()}/login`
+    const url = `${getSiteOrigin()}/tablet`
     setTarget(url)
     QRCode.toDataURL(url, {
       width: 320,
@@ -30,7 +31,7 @@ export default function InstallQR() {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={dataUrl}
-          alt="회원 앱 설치 QR 코드"
+          alt="태블릿 동의서 앱 QR 코드"
           width={240}
           height={240}
           className="rounded-lg border border-gray-100"

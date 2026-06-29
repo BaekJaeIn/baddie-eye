@@ -3,8 +3,6 @@ import { createMiddlewareClient } from '@/lib/supabase/middleware'
 
 // [SECURITY-08] deny-by-default 접근 제어.
 const PUBLIC_ADMIN_PATHS = ['/admin/login']
-// 고객 보호 경로 (미인증 시 /login)
-const MEMBER_PROTECTED_PREFIXES = ['/me', '/onboarding']
 
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createMiddlewareClient(request)
@@ -16,14 +14,12 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // --- 고객 영역 (/me, /onboarding) ---
-  const isMemberProtected = MEMBER_PROTECTED_PREFIXES.some(
-    (p) => pathname === p || pathname.startsWith(p + '/'),
-  )
-  if (isMemberProtected) {
+  // --- 태블릿 동의서 영역 (/tablet) — 관리자가 매장에서 운영 ---
+  // 관리자(로그인) 세션이 있어야 접근 가능. 미인증 시 Admin 로그인으로.
+  if (pathname.startsWith('/tablet')) {
     if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = '/admin/login'
       return NextResponse.redirect(url)
     }
     return response
@@ -52,5 +48,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/me/:path*', '/onboarding/:path*'],
+  matcher: ['/admin/:path*', '/tablet/:path*'],
 }

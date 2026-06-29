@@ -1,11 +1,10 @@
 {
-  "name": "Baddie Eye 관리자",
-  "short_name": "BaddieEye",
-  "description": "속눈썹연장샵 관리자 시스템",
-  "start_url": "/admin/login",
-  "scope": "/",
+  "name": "Baddie Eye 동의서",
+  "short_name": "동의서",
+  "description": "매장 태블릿용 시술·개인정보 동의서",
+  "start_url": "/tablet",
+  "scope": "/tablet",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#d6336c",
   "icons": [
