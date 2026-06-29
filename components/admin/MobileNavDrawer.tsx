@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import Image from 'next/image'
 import AdminNavLinks from './AdminNavLinks'
+import Logo from '@/components/ui/Logo'
 
 // 모바일 전용(md 미만): 햄버거 버튼 + 좌측 슬라이드 드로어 메뉴.
 export default function MobileNavDrawer() {
@@ -66,14 +66,10 @@ export default function MobileNavDrawer() {
           <aside className="absolute left-0 top-0 flex h-full w-64 flex-col bg-white shadow-xl">
             <div className="flex items-start justify-between border-b border-gray-100 p-4">
               <div className="flex-1">
-                <Image
-                  src="/logo-pink.png"
-                  alt="Baddie Eye"
-                  width={1057}
-                  height={165}
-                  className="w-40 px-1"
-                  priority
-                  unoptimized
+                <Logo
+                  href="/admin/dashboard"
+                  className="h-8 w-40"
+                  onClick={() => setOpen(false)}
                 />
                 <p className="mt-1 text-xs text-gray-400">관리자</p>
               </div>

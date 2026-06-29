@@ -16,7 +16,7 @@ export default function Error({
   }, [error])
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-4">
       <h2 className="text-lg font-semibold text-gray-800">
         문제가 발생했습니다
       </h2>

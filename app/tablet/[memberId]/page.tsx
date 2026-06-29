@@ -40,8 +40,10 @@ export default async function ConsentPage({ params }: ConsentPageProps) {
         <span className="text-xs text-gray-400">버전 {TERMS_VERSION}</span>
       </div>
 
-      <div className="mb-6 rounded-xl bg-white px-5 py-4 shadow-sm">
-        <p className="text-sm text-gray-500">동의 대상</p>
+      <div className="mb-6 rounded-2xl border-l-2 border-taupe bg-white px-5 py-4 shadow-sm">
+        <p className="text-sm font-medium tracking-wide text-taupe-dark">
+          동의 대상
+        </p>
         <p className="text-xl font-semibold text-gray-800">
           {member.name}
           <span className="ml-3 text-base font-normal text-gray-500">
@@ -50,8 +52,8 @@ export default async function ConsentPage({ params }: ConsentPageProps) {
         </p>
       </div>
 
-      <article className="max-h-[55vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-800">{TERMS_TITLE}</h2>
+      <article className="max-h-[55vh] overflow-y-auto rounded-2xl border border-taupe/30 bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-medium text-ink">{TERMS_TITLE}</h2>
         <p className="mt-3 text-gray-600">{TERMS_INTRO}</p>
 
         {TERMS_SECTIONS.map((section) => (

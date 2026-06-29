@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import AccentLine from '@/components/ui/AccentLine'
+import Logo from '@/components/ui/Logo'
 
 export const metadata: Metadata = {
   title: '동의서 — Baddie Eye',
@@ -14,11 +16,16 @@ export default function TabletLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="bg-brand px-6 py-4 text-white shadow-sm">
-        <h1 className="text-center text-xl font-semibold tracking-tight">
-          Baddie Eye · 동의서
-        </h1>
+    <div className="flex min-h-screen flex-col bg-cream">
+      {/* 관리자 화면과 동일하게 Baddie Eye 로고를 노출한다 */}
+      <header className="bg-white shadow-sm">
+        <AccentLine />
+        <div className="flex items-center justify-center gap-3 px-6 py-4">
+          <Logo className="h-8 w-44" />
+          <span className="rounded-full bg-blush/40 px-3 py-1 text-sm font-medium tracking-wide text-brand-dark">
+            동의서
+          </span>
+        </div>
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 p-6">{children}</main>
     </div>

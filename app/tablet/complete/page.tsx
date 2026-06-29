@@ -11,8 +11,10 @@ export default function CompletePage({ searchParams }: CompletePageProps) {
   return (
     <div className="flex flex-col items-center py-16 text-center">
       <div
-        className={`flex h-24 w-24 items-center justify-center rounded-full text-5xl ${
-          agreed ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-400'
+        className={`flex h-24 w-24 items-center justify-center rounded-full text-5xl ring-4 ${
+          agreed
+            ? 'bg-blush/40 text-brand-dark ring-blush'
+            : 'bg-gray-100 text-gray-400 ring-gray-200'
         }`}
       >
         {agreed ? '✓' : '✕'}
@@ -29,7 +31,7 @@ export default function CompletePage({ searchParams }: CompletePageProps) {
 
       <Link
         href="/tablet"
-        className="mt-10 rounded-xl bg-brand px-10 py-4 text-lg font-semibold text-white hover:bg-brand-dark"
+        className="mt-10 rounded-2xl bg-brand px-10 py-4 text-lg font-semibold text-white shadow-sm transition hover:bg-brand-dark"
       >
         다음 고객
       </Link>
